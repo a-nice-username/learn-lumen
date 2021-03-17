@@ -94,3 +94,7 @@ $router->get("try-postgres", function() {
 
     return response()->json($result);
 });
+
+$router->get("info", function() {
+    phpinfo();
+});
