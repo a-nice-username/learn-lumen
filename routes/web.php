@@ -59,3 +59,38 @@ $router->post("test-post", function() {
 
     return response()->json($result);
 });
+
+$router->get("get-all-accounts", function() {
+    $data = DB::table("accounts")->get();
+
+    return response()->json($data);
+});
+
+$router->get("try-postgres", function() {
+    $host = getenv('POSTGRES_DB_HOST');
+    $port = getenv('POSTGRES_DB_PORT');
+    $name = getenv('POSTGRES_DB_DATABASE');
+    $user = getenv('POSTGRES_DB_USERNAME');
+    $password = getenv('POSTGRES_DB_PASSWORD');
+
+    $dbconn = pg_connect("host=" . $host . " port=" . $port . " dbname=" . $name . " user=" . $user . " password=" . $password);
+
+    if (!$dbconn) {
+        $result = (object)array(
+            "api_status" => 0,
+            "api_message" => "Failed on connecting to database"
+        );
+    
+        return response()->json($result);
+    }
+
+    $data = pg_fetch_all(pg_query($dbconn, "SELECT * FROM accounts;"));
+
+    $result = (object)array(
+        "api_status" => 1,
+        "api_message" => "Success retrieving data",
+        "data" => $data
+    );
+
+    return response()->json($result);
+});
